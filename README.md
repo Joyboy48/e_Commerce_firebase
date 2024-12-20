@@ -1,4 +1,7 @@
+Just a Flutter frontend(ui design)
+
 <<<<<<< HEAD
+
 # e_Commerce_firebase
 =======
 #hi 
