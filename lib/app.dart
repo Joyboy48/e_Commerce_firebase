@@ -1,5 +1,5 @@
 import "package:studio_projects/Features/Authentication/Screens/OnBoarding/onBoarding.dart";
-//import "package:e_commerce_app/Features/Authentication/Screens/onBoarding.dart";
+
 import "package:studio_projects/Utiles/theme/theme.dart";
 import "package:flutter/material.dart";
 import "package:get/get.dart";

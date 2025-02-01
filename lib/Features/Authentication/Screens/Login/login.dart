@@ -1,6 +1,7 @@
 import 'package:studio_projects/Common/Styles/spaceing_style.dart';
 import 'package:studio_projects/Features/Authentication/Screens/password_config/forget_password.dart';
 import 'package:studio_projects/Features/Authentication/Screens/signup/signUp.dart';
+import 'package:studio_projects/Utiles/HTTP/http_client.dart';
 import 'package:studio_projects/Utiles/Helpers/helper_functions.dart';
 import 'package:studio_projects/Utiles/constants/colors.dart';
 import 'package:studio_projects/Utiles/constants/image_strings.dart';
@@ -11,9 +12,30 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-class loginPage extends StatelessWidget {
+class loginPage extends StatefulWidget {
   const loginPage({super.key});
 
+  @override
+  State<loginPage> createState() => _loginPageState();
+
+}
+
+class _loginPageState extends State<loginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void loginUser() async{
+    try{
+      final response = await HttpHelper.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+      HelperFunctions.showSnackBar("login successfull: ${response['message']}");
+      Get.to(()=> const NavigationMenu());
+    }catch(e){
+      HelperFunctions.showSnackBar('Login failed: $e' );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final dark = HelperFunctions.isDarkMode(context);
@@ -50,6 +72,7 @@ class loginPage extends StatelessWidget {
                     child: Column(
                   children: [
                     TextFormField(
+                      controller: _emailController,
                       decoration: const InputDecoration(
                         prefixIcon: Icon(
                           Iconsax.direct_right,
@@ -61,6 +84,7 @@ class loginPage extends StatelessWidget {
                       height: MySize.spaceBtwInputField,
                     ),
                     TextFormField(
+                      controller: _passwordController,
                       decoration: const InputDecoration(
                           prefixIcon: Icon(
                             Iconsax.password_check,
@@ -98,7 +122,7 @@ class loginPage extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                          onPressed: ()=>Get.to(()=>const NavigationMenu()), child: const Text(TextsStrings.signIn)),
+                          onPressed: loginUser, child: const Text(TextsStrings.signIn)),
                     ),
                     const SizedBox(
                       height: MySize.spaceBtwItems,
@@ -109,7 +133,7 @@ class loginPage extends StatelessWidget {
                       width: double.infinity,
                       child: OutlinedButton(
                           onPressed: () {
-                            Get.to(()=> const signUpPage());
+                            Get.to(()=> const SignUpPage());
                           },
                           child: const Text(TextsStrings.createAccount)),
                     ),

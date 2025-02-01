@@ -1,7 +1,12 @@
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:studio_projects/Common/Widgets/appBar/appBar.dart';
 import 'package:studio_projects/Common/Widgets/images/circular_images.dart';
 import 'package:studio_projects/Common/Widgets/texts/section_heading.dart';
+import 'package:studio_projects/Features/Authentication/Screens/Login/login.dart';
 import 'package:studio_projects/Features/personalizaion/Screens/profile/widget/profile_menu.dart';
+import 'package:studio_projects/Utiles/HTTP/http_client.dart';
+import 'package:studio_projects/Utiles/Helpers/helper_functions.dart';
 import 'package:studio_projects/Utiles/constants/image_strings.dart';
 import 'package:studio_projects/Utiles/constants/size.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +14,16 @@ import 'package:iconsax/iconsax.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  void logoutUser(BuildContext content)async{
+    try{
+      final response = await HttpHelper.logout();
+      HelperFunctions.showSnackBar("Logout successful: ${response['message']}");
+      Get.offAll(()=>const loginPage());
+    }catch(e){
+      HelperFunctions.showSnackBar("Logout failed $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
             const Divider(),
 
             Center(
-              child: TextButton(onPressed: (){}, child: const Text('Close Account',style: TextStyle(color: Colors.red ),)),
+              child: TextButton(onPressed:()=>logoutUser(context), child: const Text('Close Account',style: TextStyle(color: Colors.red ),)),
             )
 
           ],

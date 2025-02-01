@@ -8,8 +8,40 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-class signUpPage extends StatelessWidget {
-  const signUpPage({super.key});
+import '../../../../Utiles/HTTP/http_client.dart';
+
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
+
+  @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void registerUser() async{
+    try{
+      final response = await HttpHelper.register(
+          _firstNameController.text,
+          _lastNameController.text,
+          _usernameController.text,
+          _phoneNumberController.text,
+          _emailController.text,
+          _passwordController.text,
+      );
+      HelperFunctions.showSnackBar("registeration successful: ${response['message']}");
+      Get.to(()=>const VerifyEmail());
+    }catch(e){
+      HelperFunctions.showSnackBar('Registration Failed: $e');
+    }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +71,7 @@ class signUpPage extends StatelessWidget {
                     children: [
                       Expanded(
                         child:  TextFormField(
+                          controller: _firstNameController,
                           expands: false,
                           decoration: const InputDecoration(
                               labelText: TextsStrings.firstName,
@@ -50,6 +83,7 @@ class signUpPage extends StatelessWidget {
                       ),
                       Expanded(
                         child: TextFormField(
+                          controller: _lastNameController,
                           expands: false,
                           decoration: const InputDecoration(
                               labelText: TextsStrings.LastName,
@@ -62,6 +96,7 @@ class signUpPage extends StatelessWidget {
                     height: MySize.spaceBtwItems,
                   ),
                   TextFormField(
+                    controller: _usernameController,
                     expands: false,
                     decoration: const InputDecoration(
                         labelText: TextsStrings.username,
@@ -71,6 +106,7 @@ class signUpPage extends StatelessWidget {
                     height: MySize.spaceBtwInputField,
                   ),
                   TextFormField(
+                    controller: _phoneNumberController,
                     expands: false,
                     decoration: const InputDecoration(
                         labelText: TextsStrings.phoneNo,
@@ -80,6 +116,7 @@ class signUpPage extends StatelessWidget {
                     height: MySize.spaceBtwInputField,
                   ),
                   TextFormField(
+                    controller: _emailController,
                     expands: false,
                     decoration: const InputDecoration(
                         labelText: TextsStrings.email,
@@ -89,6 +126,7 @@ class signUpPage extends StatelessWidget {
                     height: MySize.spaceBtwInputField,
                   ),
                   TextFormField(
+                    controller: _passwordController,
                     expands: false,
                     decoration: const InputDecoration(
                         labelText: TextsStrings.password,
@@ -140,7 +178,7 @@ class signUpPage extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                        onPressed: () => Get.to(()=>const VerifyEmail()),
+                        onPressed:registerUser,
                         child: const Text(TextsStrings.createAccount)),
                   ),
                   const SizedBox(
