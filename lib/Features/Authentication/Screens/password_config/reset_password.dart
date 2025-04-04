@@ -100,12 +100,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 ),
                 obscureText: true,
               ),
-              const SizedBox(height: MySize.defaultSpace,),
-              ///Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(onPressed: ()=>Get.off(()=>loginPage()), child: const Text("Continue")),
-              ),
+
               const SizedBox(height: MySize.defaultSpace,),
               SizedBox(
                 width: double.infinity,

@@ -1,8 +1,42 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 
 class HttpHelper {
-  static const String _baseUrl = '-_-';
+  static const String _baseUrl = 'http://10.0.2.2:8000/api/v1/users';
+
+  static Future<http.Response> getRequest(String endpoint) async {
+    HttpClient client = HttpClient()
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+    IOClient ioClient = IOClient(client);
+    final response = await ioClient.get(Uri.parse('$_baseUrl$endpoint'));
+    return response;
+  }
+  //register
+  // static Future<Map<String, dynamic>> register(
+  //     String firstName,
+  //     String lastName,
+  //     String username,
+  //     String phoneNumber,
+  //     String email,
+  //     String password) async {
+  //   final response = await http.post(
+  //     Uri.parse('$_baseUrl/register'),
+  //     headers: {'Content-Type': 'application/json;  charset=UTF-8'},
+  //     body: json.encode({
+  //       'firstName': firstName,
+  //       'lastName': lastName,
+  //       'username': username,
+  //       'phoneNumber': phoneNumber,
+  //       'email': email,
+  //       'password': password,
+  //     }),
+  //   );
+  //   return _handleResponse(response);
+  // }
+
 
   //register
   static Future<Map<String, dynamic>> register(
@@ -12,9 +46,14 @@ class HttpHelper {
       String phoneNumber,
       String email,
       String password) async {
-    final response = await http.post(
+    HttpClient client = HttpClient()
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+
+    IOClient ioClient = IOClient(client);
+    final response = await ioClient.post(
       Uri.parse('$_baseUrl/register'),
-      headers: {'Content-Type': 'application/json;  charset=UTF-8'},
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
       body: json.encode({
         'firstName': firstName,
         'lastName': lastName,
@@ -27,20 +66,51 @@ class HttpHelper {
     return _handleResponse(response);
   }
 
+  // //login
+  // static Future<Map<String, dynamic>> login(
+  //     String email, String password) async {
+  //   final response = await http.post(
+  //     Uri.parse('$_baseUrl/login'),
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: json.encode({'email': email, 'password': password}),
+  //   );
+  //   return _handleResponse(response);
+  // }
   //login
   static Future<Map<String, dynamic>> login(
       String email, String password) async {
-    final response = await http.post(
+    HttpClient client = HttpClient()
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+
+    IOClient ioClient = IOClient(client);
+    final response = await ioClient.post(
       Uri.parse('$_baseUrl/login'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'email': email, 'password': password}),
     );
     return _handleResponse(response);
   }
+  // //logout
+  // static Future<Map<String, dynamic>> logout(String token) async {
+  //   final response = await http.post(
+  //     Uri.parse('$_baseUrl/logout'),
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer $token',
+  //     },
+  //   );
+  //   return _handleResponse(response);
+  // }
 
   //logout
   static Future<Map<String, dynamic>> logout(String token) async {
-    final response = await http.post(
+    HttpClient client = HttpClient()
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+
+    IOClient ioClient = IOClient(client);
+    final response = await ioClient.post(
       Uri.parse('$_baseUrl/logout'),
       headers: {
         'Content-Type': 'application/json',

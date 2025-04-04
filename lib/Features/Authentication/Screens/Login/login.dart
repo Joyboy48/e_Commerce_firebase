@@ -4,6 +4,7 @@ import 'package:studio_projects/Features/Authentication/Screens/password_config/
 import 'package:studio_projects/Features/Authentication/Screens/signup/signUp.dart';
 import 'package:studio_projects/Utiles/HTTP/http_client.dart';
 import 'package:studio_projects/Utiles/Helpers/helper_functions.dart';
+import 'package:studio_projects/Utiles/Validators/validation.dart';
 import 'package:studio_projects/Utiles/constants/colors.dart';
 import 'package:studio_projects/Utiles/constants/image_strings.dart';
 import 'package:studio_projects/Utiles/constants/size.dart';
@@ -49,6 +50,7 @@ class _loginPageState extends State<loginPage> {
         await prefs.setString('accessToken', accessToken);
 
         // Navigate to the ProfileScreen
+        //Get.off(() => ProfileScreen(token: accessToken));
         Get.off(() => ProfileScreen(token: accessToken));
       } else {
         HelperFunctions.showSnackBar("Login failed: Invalid response");
@@ -105,6 +107,7 @@ class _loginPageState extends State<loginPage> {
                         ),
                         labelText: TextsStrings.email,
                       ),
+                      validator: Validator.validateEmail,
                     ),
                     const SizedBox(
                       height: MySize.spaceBtwInputField,
@@ -117,6 +120,7 @@ class _loginPageState extends State<loginPage> {
                           ),
                           labelText: TextsStrings.password,
                           suffixIcon: Icon(Iconsax.eye_slash)),
+                      validator: Validator.validatePassword,
                     ),
                     const SizedBox(
                       height: MySize.spaceBtwInputField / 2,

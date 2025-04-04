@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:studio_projects/Features/Authentication/Screens/signup/verify_email.dart';
 import 'package:studio_projects/Utiles/Helpers/helper_functions.dart';
+import 'package:studio_projects/Utiles/Validators/validation.dart';
 import 'package:studio_projects/Utiles/constants/colors.dart';
 import 'package:studio_projects/Utiles/constants/image_strings.dart';
 import 'package:studio_projects/Utiles/constants/size.dart';
@@ -137,6 +138,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     decoration: const InputDecoration(
                         labelText: TextsStrings.phoneNo,
                         prefixIcon: Icon(Iconsax.call)),
+                    validator: Validator.validatePhoneNumber,
                   ),
                   const SizedBox(
                     height: MySize.spaceBtwInputField,
@@ -147,6 +149,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     decoration: const InputDecoration(
                         labelText: TextsStrings.email,
                         prefixIcon: Icon(Iconsax.direct_right)),
+                    validator: Validator.validateEmail,
                   ),
                   const SizedBox(
                     height: MySize.spaceBtwInputField,
@@ -158,6 +161,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         labelText: TextsStrings.password,
                         prefixIcon: Icon(Iconsax.password_check),
                         suffixIcon: Icon(Iconsax.eye_slash)),
+                    validator: Validator.validatePassword,
                   ),
                   const SizedBox(
                     height: MySize.defaultSpace,
