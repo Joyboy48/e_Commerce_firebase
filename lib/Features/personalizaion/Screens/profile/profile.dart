@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studio_projects/Common/Widgets/appBar/appBar.dart';
 import 'package:studio_projects/Common/Widgets/images/circular_images.dart';
 import 'package:studio_projects/Common/Widgets/texts/section_heading.dart';
@@ -13,13 +14,18 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+
+  final String token;
+  const ProfileScreen({super.key,required this.token});
 
   void logoutUser(BuildContext content)async{
     try{
-      final response = await HttpHelper.logout();
+      final response = await HttpHelper.logout(token);
       HelperFunctions.showSnackBar("Logout successful: ${response['message']}");
-      Get.offAll(()=>const loginPage());
+      // Clear the token from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+      Get.offAll(() => const loginPage());
     }catch(e){
       HelperFunctions.showSnackBar("Logout failed $e");
     }
@@ -27,6 +33,8 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    const String token = 'your_token';
     return Scaffold(
       appBar: const MyAppBar(
         showBackArrow: true,

@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studio_projects/Common/Widgets/appBar/appBar.dart';
 import 'package:studio_projects/Common/Widgets/custom_shapes/container/primary_headerContainer.dart';
 import 'package:studio_projects/Common/Widgets/list_tile/settings_menu_tile.dart';
@@ -16,6 +17,12 @@ import 'package:iconsax/iconsax.dart';
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
 
+  Future<void> _navigateToProfileScreen(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    Get.to(() => ProfileScreen(token: token));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +38,7 @@ class SettingScreen extends StatelessWidget {
                 ),
                 //SizedBox(height: MySize.spaceBtwSection ,),
                 ///userprofile
-                userProfileTile(onPressed: ()=>Get.to(()=> const ProfileScreen()),),
+                userProfileTile(onPressed: ()=>_navigateToProfileScreen(context)),
                 const SizedBox(height: MySize.spaceBtwSection,)
               ],
             ),),

@@ -39,10 +39,13 @@ class HttpHelper {
   }
 
   //logout
-  static Future<Map<String, dynamic>> logout() async {
+  static Future<Map<String, dynamic>> logout(String token) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/logout'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
     return _handleResponse(response);
   }
@@ -80,7 +83,7 @@ class HttpHelper {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to load data: ${response.statusCode}');
+      throw Exception('Failed to load data: ${response.statusCode} ${response.reasonPhrase}');
     }
   }
 }

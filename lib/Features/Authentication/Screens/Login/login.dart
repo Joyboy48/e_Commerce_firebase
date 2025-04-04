@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studio_projects/Common/Styles/spaceing_style.dart';
 import 'package:studio_projects/Features/Authentication/Screens/password_config/forget_password.dart';
 import 'package:studio_projects/Features/Authentication/Screens/signup/signUp.dart';
@@ -12,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../personalizaion/Screens/profile/profile.dart';
+
 class loginPage extends StatefulWidget {
   const loginPage({super.key});
 
@@ -23,19 +26,42 @@ class loginPage extends StatefulWidget {
 class _loginPageState extends State<loginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+  bool _rememberMe = false;
 
-  void loginUser() async{
-    try{
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
       final response = await HttpHelper.login(
         _emailController.text,
         _passwordController.text,
       );
-      HelperFunctions.showSnackBar("login successfull: ${response['message']}");
-      Get.to(()=> const NavigationMenu());
-    }catch(e){
-      HelperFunctions.showSnackBar('Login failed: $e' );
+
+      print('Response: $response');
+
+      if (response != null && response.containsKey('data') && response['data'].containsKey('accessToken')) {
+        final accessToken = response['data']['accessToken'];
+        // Store the accessToken securely using SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', accessToken);
+
+        // Navigate to the ProfileScreen
+        Get.off(() => ProfileScreen(token: accessToken));
+      } else {
+        HelperFunctions.showSnackBar("Login failed: Invalid response");
+      }
+    } catch (e) {
+      HelperFunctions.showSnackBar("Login failed: $e");
+    }  finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final dark = HelperFunctions.isDarkMode(context);
@@ -103,7 +129,14 @@ class _loginPageState extends State<loginPage> {
                         ///remember me
                         Row(
                           children: [
-                            Checkbox(value: true, onChanged: (value) {}),
+                            Checkbox(
+                              value: _rememberMe,
+                              onChanged: (value) {
+                                setState(() {
+                                  _rememberMe = value!;
+                                });
+                              },
+                            ),
                             const Text(TextsStrings.rememberMe)
                           ],
                         ),
@@ -122,7 +155,7 @@ class _loginPageState extends State<loginPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                          onPressed: loginUser, child: const Text(TextsStrings.signIn)),
+                          onPressed: _login, child: const Text(TextsStrings.signIn)),
                     ),
                     const SizedBox(
                       height: MySize.spaceBtwItems,

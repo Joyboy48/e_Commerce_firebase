@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:studio_projects/Features/Authentication/Screens/password_config/reset_password.dart';
 import 'package:studio_projects/Utiles/constants/size.dart';
 import 'package:studio_projects/Utiles/constants/texts_strings.dart';
@@ -5,8 +7,41 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-class ForgetPassword extends StatelessWidget {
+class ForgetPassword extends StatefulWidget {
   const ForgetPassword({super.key});
+
+  @override
+  _ForgetPasswordState createState() => _ForgetPasswordState();
+}
+
+class _ForgetPasswordState extends State<ForgetPassword> {
+  final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _sendOtp() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8000/api/v1/users/forgot-password'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': _emailController.text}),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final otpToken = data['data']['otpToken'];
+      Get.to(() => ResetPassword(otpToken: otpToken));
+    } else {
+      final error = json.decode(response.body)['message'];
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +70,7 @@ class ForgetPassword extends StatelessWidget {
 
             ///Text Field
             TextFormField(
+              controller: _emailController,
               decoration: const InputDecoration(
                 labelText: TextsStrings.email,
                 prefixIcon: Icon(Iconsax.direct_right),
@@ -48,8 +84,8 @@ class ForgetPassword extends StatelessWidget {
             SizedBox(
               width: double.infinity,
                 child: ElevatedButton(
-              onPressed: () => Get.off(()=>const ResetPassword()),
-              child: const Text("Submit"),
+                  onPressed: _isLoading ? null : _sendOtp,
+                  child: _isLoading ? CircularProgressIndicator() : const Text("Submit"),
             ))
           ],
         ),

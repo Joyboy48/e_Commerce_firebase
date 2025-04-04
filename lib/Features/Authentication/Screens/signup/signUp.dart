@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:studio_projects/Features/Authentication/Screens/signup/verify_email.dart';
 import 'package:studio_projects/Utiles/Helpers/helper_functions.dart';
 import 'package:studio_projects/Utiles/constants/colors.dart';
@@ -18,6 +19,8 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+
+  bool _isAgreed = false;
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -42,6 +45,29 @@ class _SignUpPageState extends State<SignUpPage> {
       HelperFunctions.showSnackBar('Registration Failed: $e');
     }
 }
+
+  // Added method to show policy dialog
+  void _showPolicyDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: Text(content),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +166,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   ///terms and conditions
                   Row(
                     children: [
-                      Checkbox(value: true, onChanged: (value) {}),
+                      Checkbox( value: _isAgreed,
+                        onChanged: (value) {
+                        setState(() {
+                          _isAgreed = value!;
+                        });
+                      },
+                      ),
                       Text.rich(TextSpan(children: [
                         TextSpan(
                             text: '${TextsStrings.iAgreeTo}  ',
@@ -156,7 +188,27 @@ class _SignUpPageState extends State<SignUpPage> {
                                   decoration: TextDecoration.underline,
                                   decorationColor:
                                       dark ? MyColors.white : MyColors.primary,
-                                )),
+                                ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              _showPolicyDialog(
+                                  'Privacy Policy',
+                                  'Your privacy is important '
+                                      'to us. We are committed'
+                                      ' to protecting your personal '
+                                      'information and your right to '
+                                      'privacy. This Privacy Policy explains'
+                                      ' what information we collect, how we us'
+                                      'e it, and what rights you have in relation'
+                                      ' to it. We collect personal information that'
+                                      ' you provide to us such as name, address,'
+                                      ' contact information, passwords, and security '
+                                      'data. We use this information to provide, operate, '
+                                      'and maintain our services, improve, personalize, and'
+                                      ' expand our services, and understand and analyze '
+                                      'how you use our services.');
+                            },
+                        ),
                         TextSpan(
                             text: '${TextsStrings.and}  ',
                             style: Theme.of(context).textTheme.bodySmall),
@@ -171,7 +223,33 @@ class _SignUpPageState extends State<SignUpPage> {
                                   decoration: TextDecoration.underline,
                                   decorationColor:
                                       dark ? MyColors.white : MyColors.primary,
-                                )),
+                                ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              _showPolicyDialog(
+                                  'Terms of Use',
+                                  'By accessing or'
+                                      ' using our services,'
+                                      ' you agree to be bound '
+                                      'by these Terms of Use. You'
+                                      ' may use our services only '
+                                      'as permitted by law. You must'
+                                      ' not misuse our services. For'
+                                      ' example, do not interfere with '
+                                      'our services or try to access them'
+                                      ' using a method other than the '
+                                      'interface and the instructions'
+                                      ' that we provide. We may suspend'
+                                      ' or stop providing our services '
+                                      'to you if you do not comply with'
+                                      'our terms or policies or if we are'
+                                      ' investigating suspected misconduct.'
+                                      ' Using our services does not give you '
+                                      'ownership of any intellectual property'
+                                      ' rights in our services or the content'
+                                      ' you access.');
+                            },
+                        ),
                       ]))
                     ],
                   ),
