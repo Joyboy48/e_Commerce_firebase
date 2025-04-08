@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpHelper {
   static const String _baseUrl = 'http://10.0.2.2:8000/api/v1/users';
@@ -154,6 +155,30 @@ class HttpHelper {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to load data: ${response.statusCode} ${response.reasonPhrase}');
+    }
+  }
+
+  // lib/Utiles/HTTP/http_client.dart
+
+
+
+
+  Future<void> sendRequestWithToken(String endpoint) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? '';
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Response: ${response.body}');
+    } else {
+      print('Failed to fetch data: ${response.statusCode} ${response.reasonPhrase}');
     }
   }
 }

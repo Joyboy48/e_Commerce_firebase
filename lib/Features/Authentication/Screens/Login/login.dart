@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../../Utiles/Helpers/cookie_helper.dart';
 import '../../../personalizaion/Screens/profile/profile.dart';
 
 class loginPage extends StatefulWidget {
@@ -30,6 +31,12 @@ class _loginPageState extends State<loginPage> {
   bool _isLoading = false;
   bool _rememberMe = false;
 
+  Future<void> _navigateToHomePage(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? '';
+    Get.to(() => NavigationMenu());
+  }
+
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
@@ -43,15 +50,11 @@ class _loginPageState extends State<loginPage> {
 
       print('Response: $response');
 
+
       if (response != null && response.containsKey('data') && response['data'].containsKey('accessToken')) {
         final accessToken = response['data']['accessToken'];
-        // Store the accessToken securely using SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('accessToken', accessToken);
-
-        // Navigate to the ProfileScreen
-        //Get.off(() => ProfileScreen(token: accessToken));
-        Get.off(() => ProfileScreen(token: accessToken));
+        await storeToken(accessToken); // Store token using SharedPreferences
+        _navigateToHomePage(context); // Navigate to Home Page
       } else {
         HelperFunctions.showSnackBar("Login failed: Invalid response");
       }
