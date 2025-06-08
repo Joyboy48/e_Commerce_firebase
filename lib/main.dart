@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studio_projects/main.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +22,31 @@ Future<void> main() async {
   // );
   //Todo: initaialise authentication
 
-  runApp(const App());
+
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  runApp(SplashScreen(isLoggedIn: token != null));
+}
+
+class SplashScreen extends StatelessWidget {
+  final bool isLoggedIn;
+
+  const SplashScreen({Key? key, required this.isLoggedIn}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: FutureBuilder(
+        future: Future.delayed(const Duration(seconds: 2)), // Simulate loading
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return App(isLoggedIn: isLoggedIn);
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
+    );
+  }
 }
 

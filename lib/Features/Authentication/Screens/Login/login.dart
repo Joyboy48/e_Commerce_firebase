@@ -30,11 +30,12 @@ class _loginPageState extends State<loginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _rememberMe = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _navigateToHomePage(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken') ?? '';
-    Get.to(() => NavigationMenu());
+    Get.offAll(() => NavigationMenu());
   }
 
   Future<void> _login() async {
@@ -48,24 +49,34 @@ class _loginPageState extends State<loginPage> {
         _passwordController.text,
       );
 
-      print('Response: $response');
+      // ✅ Fix this part
+      if (response != null &&
+          response.containsKey('body') &&
+          response['body'].containsKey('data') &&
+          response['body']['data'].containsKey('accessToken')) {
 
+        final accessToken = response['body']['data']['accessToken'];
 
-      if (response != null && response.containsKey('data') && response['data'].containsKey('accessToken')) {
-        final accessToken = response['data']['accessToken'];
-        await storeToken(accessToken); // Store token using SharedPreferences
-        _navigateToHomePage(context); // Navigate to Home Page
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', accessToken); // Store the token
+
+        print("Token stored: $accessToken");
+
+        _navigateToHomePage(context); // Go to home
       } else {
-        HelperFunctions.showSnackBar("Login failed: Invalid response");
+        HelperFunctions.showSnackBar("Login failed: Invalid response structure");
+        print("Full response: $response");
       }
     } catch (e) {
       HelperFunctions.showSnackBar("Login failed: $e");
-    }  finally {
+      print("Login Exception: $e");
+    } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -117,12 +128,24 @@ class _loginPageState extends State<loginPage> {
                     ),
                     TextFormField(
                       controller: _passwordController,
-                      decoration: const InputDecoration(
-                          prefixIcon: Icon(
+                      obscureText:!_isPasswordVisible,
+                      decoration: InputDecoration(
+                          prefixIcon: const Icon(
                             Iconsax.password_check,
                           ),
+
                           labelText: TextsStrings.password,
-                          suffixIcon: Icon(Iconsax.eye_slash)),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible ? Iconsax.eye : Iconsax.eye_slash,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible; // Toggle state
+                            });
+                          },
+                        ),
+                      ),
                       validator: Validator.validatePassword,
                     ),
                     const SizedBox(

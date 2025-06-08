@@ -9,46 +9,25 @@ class HttpHelper {
 
   static Future<http.Response> getRequest(String endpoint) async {
     HttpClient client = HttpClient()
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host,
+          int port) => true;
 
     IOClient ioClient = IOClient(client);
     final response = await ioClient.get(Uri.parse('$_baseUrl$endpoint'));
     return response;
   }
-  //register
-  // static Future<Map<String, dynamic>> register(
-  //     String firstName,
-  //     String lastName,
-  //     String username,
-  //     String phoneNumber,
-  //     String email,
-  //     String password) async {
-  //   final response = await http.post(
-  //     Uri.parse('$_baseUrl/register'),
-  //     headers: {'Content-Type': 'application/json;  charset=UTF-8'},
-  //     body: json.encode({
-  //       'firstName': firstName,
-  //       'lastName': lastName,
-  //       'username': username,
-  //       'phoneNumber': phoneNumber,
-  //       'email': email,
-  //       'password': password,
-  //     }),
-  //   );
-  //   return _handleResponse(response);
-  // }
 
 
   //register
-  static Future<Map<String, dynamic>> register(
-      String firstName,
+  static Future<Map<String, dynamic>> register(String firstName,
       String lastName,
       String username,
       String phoneNumber,
       String email,
       String password) async {
     HttpClient client = HttpClient()
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host,
+          int port) => true;
 
 
     IOClient ioClient = IOClient(client);
@@ -67,21 +46,13 @@ class HttpHelper {
     return _handleResponse(response);
   }
 
-  // //login
-  // static Future<Map<String, dynamic>> login(
-  //     String email, String password) async {
-  //   final response = await http.post(
-  //     Uri.parse('$_baseUrl/login'),
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: json.encode({'email': email, 'password': password}),
-  //   );
-  //   return _handleResponse(response);
-  // }
+
   //login
-  static Future<Map<String, dynamic>> login(
-      String email, String password) async {
+  static Future<Map<String, dynamic>> login(String email,
+      String password) async {
     HttpClient client = HttpClient()
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host,
+          int port) => true;
 
 
     IOClient ioClient = IOClient(client);
@@ -92,73 +63,38 @@ class HttpHelper {
     );
     return _handleResponse(response);
   }
-  // //logout
-  // static Future<Map<String, dynamic>> logout(String token) async {
-  //   final response = await http.post(
-  //     Uri.parse('$_baseUrl/logout'),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer $token',
-  //     },
-  //   );
-  //   return _handleResponse(response);
-  // }
+
+
 
   //logout
   static Future<Map<String, dynamic>> logout(String token) async {
     HttpClient client = HttpClient()
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-
+      ..badCertificateCallback = (X509Certificate cert, String host,
+          int port) => true;
 
     IOClient ioClient = IOClient(client);
     final response = await ioClient.post(
       Uri.parse('$_baseUrl/logout'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $token', // This is correct
       },
     );
+
     return _handleResponse(response);
   }
 
-  // static Future<Map<String, dynamic>> get(String endpoint) async {
-  //   final response = await http.get(Uri.parse('$_baseUrl/$endpoint'));
-  //   return _handleResponse(response);
-  // }
-  //
-  // static Future<Map<String, dynamic>> post(
-  //     String endpoint, dynamic data) async {
-  //   final response = await http.post(
-  //     Uri.parse('$_baseUrl/$endpoint'),
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: json.encode(data),
-  //   );
-  //   return _handleResponse(response);
-  // }
-  //
-  // static Future<Map<String, dynamic>> put(String endpoint, dynamic data) async {
-  //   final response = await http.put(
-  //     Uri.parse('$_baseUrl/$endpoint'),
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: json.encode(data),
-  //   );
-  //   return _handleResponse(response);
-  // }
-  //
-  // static Future<Map<String, dynamic>> delete(String endpoint) async {
-  //   final response = await http.delete(Uri.parse('$_baseUrl/$endpoint'));
-  //   return _handleResponse(response);
-  // }
+
   //
   static Map<String, dynamic> _handleResponse(http.Response response) {
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load data: ${response.statusCode} ${response.reasonPhrase}');
-    }
+    final decoded = jsonDecode(response.body);
+
+    return {
+      'statusCode': response.statusCode,
+      'body': decoded,
+    };
   }
 
-  // lib/Utiles/HTTP/http_client.dart
 
 
 
@@ -178,7 +114,126 @@ class HttpHelper {
     if (response.statusCode == 200) {
       print('Response: ${response.body}');
     } else {
-      print('Failed to fetch data: ${response.statusCode} ${response.reasonPhrase}');
+      print('Failed to fetch data: ${response.statusCode} ${response
+          .reasonPhrase}');
     }
   }
+
+
+  Future<Map<String, dynamic>> getUserProfile(String token) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/profile'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    return {
+      'statusCode': response.statusCode,
+      'body': json.decode(response.body),
+    };
+  }
+
+  Future<Map<String, dynamic>> updateUserProfile(String token, Map<String, dynamic> updatedData) async {
+    final url = Uri.parse("$_baseUrl/profile");
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: jsonEncode(updatedData),
+    );
+
+    final body = jsonDecode(response.body);
+    return {'statusCode': response.statusCode, 'body': body};
+  }
+
+  Future<Map<String, dynamic>> uploadProfilePicture(String token, File imageFile) async {
+    final url = Uri.parse("$_baseUrl/upload-avatar");
+
+    var request = http.MultipartRequest('POST', url);
+
+    request.headers['Authorization'] = 'Bearer $token';
+
+    request.files.add(await http.MultipartFile.fromPath('avatar', imageFile.path));
+
+    try {
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      final body = jsonDecode(response.body);
+
+      return {'statusCode': response.statusCode, 'body': body};
+    } catch (e) {
+      return {
+        'statusCode': 500,
+        'body': {'error': 'Error uploading image: $e'}
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> addAddress(String token, Map<String, dynamic> addressData) async {
+    final url = Uri.parse("$_baseUrl/address");
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: jsonEncode(addressData),
+    );
+
+    final body = jsonDecode(response.body);
+    return {'statusCode': response.statusCode, 'body': body};
+  }
+  Future<List<Map<String, dynamic>>> getUserAddresses(String token) async {
+    final url = Uri.parse("$_baseUrl/addresses");
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    final body = jsonDecode(response.body);
+    if (response.statusCode == 200 && body['addresses'] != null) {
+      return List<Map<String, dynamic>>.from(body['addresses']);
+    } else {
+      throw Exception("Failed to load addresses");
+    }
+  }
+
+  Future<Map<String, dynamic>> updateAddress(String token, String id, Map<String, dynamic> data) async {
+    final response = await http.put(
+      Uri.parse('$_baseUrl/address/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(data),
+    );
+    return {'statusCode': response.statusCode, 'body': jsonDecode(response.body)};
+  }
+
+// Delete address by ID
+  Future<Map<String, dynamic>> deleteAddress(String token, String id) async {
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/address/$id'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    return {
+      'statusCode': response.statusCode,
+      'body': response.body,
+    };
+  }
+
+
+
 }
+
+
+
